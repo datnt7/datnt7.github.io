@@ -30,7 +30,7 @@
 
       function geocode(adr) {
         geocoder
-          .geocode({ address: adr, region: "JP" })
+          .geocode({ address: adr, region: "JP", language: "jp"  })
           .then((result) => {
             const { results } = result;
             console.log(result);

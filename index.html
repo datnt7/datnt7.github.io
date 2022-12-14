@@ -1,77 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>test video auto play</title>
+    <title>Test API</title>
   </head>
   <body>
-    <div id="container">
-      <div id="cover">
-        <div id="youtube"></div>
-      </div>
-    </div>
-  </body>
-  <script>
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    const first_script = document.getElementsByTagName("script")[0];
-    if (first_script && first_script.parentNode) {
-      first_script.parentNode.insertBefore(tag, first_script);
-    }
-    function onPlayerReady(event) {
-      event.target.mute();
-      event.target.playVideo();
-    }
-    function onPlayerStateChange(event) {
-      console.log(event);
-      if (event.data == YT.PlayerState.ENDED) {
-        event.target.playVideo();
-      }
-    }
-    window.onYouTubeIframeAPIReady = () => {
-      console.log("onYouTubeIframeAPIReady");
-      const ytPlayer = new YT.Player("youtube", {
-        videoId: "icPHcK_cCF4",
-        playerVars: {
-          playsinline: 1,
-          autoplay: 1,
-          fs: 0,
-          rel: 0,
-          controls: 0,
-          modestbranding: 1,
-          iv_load_policy: 3,
-          start: 50,
-        },
-        events: {
-          onReady: onPlayerReady,
-          onStateChange: onPlayerStateChange,
-        },
-      });
-    };
-  </script>
-  <style>
-    #youtube {
-      position: absolute;
-      z-index: -10;
-      top: 0;
-      left: 0;
-      width: 300%;
-      margin-left: -100%;
-      height: 100vh;
-    }
+    <h2>郵便番号/住所を入力し、Enter キーを押します</h2>
+    <p>EX: 251-0047</p>
+    <input id="inputData" />
+    <button id="searchBtn">探す</button>
+    <p>結果がない場合は開発者ツールを開いてエラーを追跡する</p>
 
-    #cover {
-      position: absolute;
-      z-index: -5;
-      pointer-events: none;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      aspect-ratio: 16/9;
-    }
-  </style>
+    <p id="data"></p>
+    <script>
+      let geocoder;
+
+      function initMap() {
+        geocoder = new google.maps.Geocoder();
+        const input = document.getElementById("inputData");
+        const searchBtn = document.getElementById("searchBtn");
+        searchBtn.addEventListener("click", (e) => {
+          geocode(input.value);
+        });
+        input.addEventListener("keyup", function (event) {
+          if (event.key === "Enter") {
+            geocode(input.value);
+          }
+        });
+      }
+
+      function geocode(adr) {
+        geocoder
+          .geocode({ address: adr, region: "JP", language: "jp"  })
+          .then((result) => {
+            const { results } = result;
+            console.log(result);
+            document.getElementById("data").innerText = JSON.stringify(
+              result,
+              null,
+              2
+            );
+            return results;
+          })
+          .catch((e) => {
+            document.getElementById("data").innerText =
+              "次の理由により、ジオコーディングは成功しませんでした: " + e;
+          });
+      }
+      window.initMap = initMap;
+    </script>
+
+    <script
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCACBZzy2KGOFy_OJ5gmq4RKlIpka_P8M0&callback=initMap"
+    ></script>
+  </body>
 </html>

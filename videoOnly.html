@@ -4,23 +4,53 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>test video auto play</title>
   </head>
   <body>
     <div id="container">
       <div id="cover">
-        <iframe
-          width="1280"
-          height="720"
-          id="youtube"
-          src="https://www.youtube.com/embed/y13JsbpHaT4?autoplay=1&mute=1&loop=1&playlist=y13JsbpHaT4&playsinline=1&modestbranding=1&disablekb=1&rel=0&controls=0"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-        ></iframe>
+        <div id="youtube"></div>
       </div>
     </div>
   </body>
+  <script>
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    const first_script = document.getElementsByTagName("script")[0];
+    if (first_script && first_script.parentNode) {
+      first_script.parentNode.insertBefore(tag, first_script);
+    }
+    function onPlayerReady(event) {
+      event.target.mute();
+      event.target.playVideo();
+    }
+    function onPlayerStateChange(event) {
+      console.log(event);
+      if (event.data == YT.PlayerState.ENDED) {
+        event.target.playVideo();
+      }
+    }
+    window.onYouTubeIframeAPIReady = () => {
+      console.log("onYouTubeIframeAPIReady");
+      const ytPlayer = new YT.Player("youtube", {
+        videoId: "icPHcK_cCF4",
+        playerVars: {
+          playsinline: 1,
+          autoplay: 1,
+          fs: 0,
+          rel: 0,
+          controls: 0,
+          modestbranding: 1,
+          iv_load_policy: 3,
+          start: 50,
+        },
+        events: {
+          onReady: onPlayerReady,
+          onStateChange: onPlayerStateChange,
+        },
+      });
+    };
+  </script>
   <style>
     #youtube {
       position: absolute;
@@ -28,8 +58,6 @@
       top: 0;
       left: 0;
       width: 300%;
-      height: 100%;
-      /* ...and bring it back again */
       margin-left: -100%;
       height: 100vh;
     }
@@ -43,9 +71,7 @@
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      /* Keep it the right aspect-ratio */
       aspect-ratio: 16/9;
-      /* No clicking/hover effects */
     }
   </style>
 </html>
